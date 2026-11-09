@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.payment.mapper.AccountMapper">
+
+<!--    OAuth    -->
+    <select id="selectOAuth" resultType="com.example.payment.dto.OAuthInfo">
+        Select provider, provider_id, email, role, name, exist From oauth_info Where provider = #{provider} And email = #{email}
+    </select>
+
+    <insert id="insertOAuth">
+        Insert into oauth_info (provider, provider_id, email, name)
+        Value (#{provider}, #{providerId}, #{email}, #{name})
+    </insert>
+
+    <update id="updateOAuth">
+        Update oauth_info
+        <set>
+            <if test="name != null and !name.isBlank()">name = #{name}</if>
+        </set>
+        Where provider = #{provider} And provider_id = #{providerId};
+    </update>
+
+    <update id="withdrawOAuth">
+        Update oauth_info
+        Set exist = 0
+        Where provider = #{provider} And email = #{email};
+    </update>
+
+<!--    token   -->
+    <select id="selectRefreshToken" resultType="string">
+        Select refresh_token From refresh_token_info Where account_id = #{id} and provider = #{provider}
+    </select>
+
+    <insert id="insertRefreshToken">
+        Insert Into refresh_token_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="provider != null">provider,</if>
+            account_id, refresh_token
+        </trim>
+        <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
+            <if test="provider != null">#{provider},</if>
+            #{id}, #{refreshToken}
+        </trim>
+    </insert>
+
+    <update id="updateRefreshToken">
+        Update refresh_token_info Set refresh_token = #{refreshToken}
+        Where account_id = #{id} and provider = #{provider}
+    </update>
+
+    <delete id="deleteRefreshToken">
+        Delete From refresh_token_info Where account_id = #{id} and provider = #{provider}
+    </delete>
+
+</mapper>
