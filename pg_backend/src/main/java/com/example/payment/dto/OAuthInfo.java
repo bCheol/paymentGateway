@@ -15,5 +15,6 @@ public class OAuthInfo {
     String role;
     String name;
     Integer exist;
+    Integer block;
 
 }

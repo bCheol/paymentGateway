@@ -1,6 +1,5 @@
 package com.example.payment.config;
 
-import com.example.payment.config.CookieUtil;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

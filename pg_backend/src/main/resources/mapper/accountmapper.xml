@@ -5,7 +5,7 @@
 
 <!--    OAuth    -->
     <select id="selectOAuth" resultType="com.example.payment.dto.OAuthInfo">
-        Select provider, provider_id, email, role, name, exist From oauth_info Where provider = #{provider} And email = #{email}
+        Select provider, provider_id, email, role, name, exist, block From oauth_info Where provider = #{provider} And email = #{email}
     </select>
 
     <insert id="insertOAuth">

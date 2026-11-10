@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.payment.mapper.PaymentMapper">
+
+    <!--    NicePayment -->
+    <select id="existsOrderKey">
+        Select Exists (Select 1 From temp_order Where order_key = #{orderKey})
+    </select>
+
+    <insert id="insertTempOrder">
+        Insert Into temp_order (order_key, order_id, amount)
+        Value (#{orderKey}, #{orderId}, #{amount})
+    </insert>
+
+    <select id="validateOrder" resultType="int">
+        Select Exists (Select 1 temp_order From temp_order Where order_id = #{orderId} And amount = #{amount})
+    </select>
+
+    <insert id="insertOrderInfo">
+        Insert Into order_info (order_id, amount)
+        Value (#{orderId}, #{amount})
+    </insert>
+
+    <select id="selectOrderInfo" resultType="map">
+        Select order_id, amount From order_info Where order_id = #{orderId}
+    </select>
+
+</mapper>

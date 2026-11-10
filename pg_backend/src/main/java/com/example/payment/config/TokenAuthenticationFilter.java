@@ -21,7 +21,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
         String url = request.getRequestURL().toString();
 
-        if (url.contains("/api/account")) {
+        if (url.contains("/api")) {
             String authorizationHeader = request.getHeader("Authorization");
             if (authorizationHeader == null) {
                 response.setStatus(401);

@@ -36,5 +36,10 @@ public class NicePaymentResult {
     Boolean IssuedCashReceipt;
     String receiptUrl;
     String mallUserId;
+    Object coupon;
+    Object card;
+    Object cashReceipts;
+    Object bank;
+    Object vbnak;
 
 }

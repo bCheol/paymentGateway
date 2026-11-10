@@ -1,43 +1,80 @@
 package com.example.payment.controller;
 
+import com.example.payment.config.ErrorCode;
+import com.example.payment.dto.NicePaymentResult;
+import com.example.payment.dto.ResponseData;
 import com.example.payment.service.PaymentService;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
 public class PaymentController {
 
+    String baseUrl = "http://localhost:3000";
+
     private final PaymentService paymentService;
 
+    @PostMapping("/api/order-temp")
+    public ResponseData orderTemp(@RequestBody Map<String, Object> body) {
+
+        String orderKey = (String) body.get("orderKey");
+
+        if (paymentService.existsOrderKey(orderKey))
+            return new ResponseData(false, ErrorCode.ORDER_VALIDATE_FAIL.getMessage());
+
+        String orderId = (String) body.get("orderId");
+        Integer amount = (Integer) body.get("amount");
+
+        try {
+            paymentService.saveTempOrder(orderKey, orderId, amount);
+            return new ResponseData(true, null);
+        } catch (Exception e) {
+            return new ResponseData(false, ErrorCode.ORDER_SAVE_FAIL.getMessage());
+        }
+    }
 
     @PostMapping("/serverAuth")
-    public void testMethod(HttpServletRequest request, HttpServletResponse response, @RequestParam Map<String, String> body) throws IOException {
+    public void nicePaymentReturn(HttpServletResponse response, @RequestParam Map<String, String> body) {
 
         String authResultCode = body.get("authResultCode");
 
         if ("0000".equals(authResultCode)) {
+            String orderId = body.get("orderId");
+            String amount = body.get("amount");
 
-            String tid = body.get("tid");
-            String clientId = body.get("clientId");
-            String orderId =body.get("orderId");
-            String amount =body.get("amount");
-            String authToken =body.get("authToken");
-            String signature =body.get("signature");
+            if (paymentService.validateOrder(orderId, amount)) {
+                String tid = body.get("tid");
+                NicePaymentResult nicePaymentResult = paymentService.approveOrder(tid, amount);
 
-            paymentService.successPay(tid, amount);
+                if (nicePaymentResult == null)
+                    return;
 
-            response.sendRedirect("http://localhost:3000/payment");
-        } else {
-
+                if ("0000".equals(nicePaymentResult.getResultCode())) {
+                    try {
+                        paymentService.saveOrder(nicePaymentResult.getOrderId(), nicePaymentResult.getAmount());
+                        response.sendRedirect(baseUrl + "/order?orderId="+orderId);
+                        return;
+                    } catch (Exception e) {
+                        return;
+                    }
+                } else {
+                    return;
+                }
+            } else{
+                return;
+            }
         }
+    }
+
+    @GetMapping("/api/order-info")
+    public ResponseData orderInfo( @AuthenticationPrincipal String authId, @RequestParam String orderId) {
+
+        return new ResponseData(true, paymentService.getOrderInfo(orderId, authId));
     }
 
 }
