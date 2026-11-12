@@ -10,6 +10,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 @RequiredArgsConstructor
 public class TokenAuthenticationFilter extends OncePerRequestFilter {
@@ -19,9 +20,10 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
+        String[] targetUrl = {"/api/account", "/api/payment"};
         String url = request.getRequestURL().toString();
 
-        if (url.contains("/api")) {
+        if (Arrays.stream(targetUrl).anyMatch(url::contains)) {
             String authorizationHeader = request.getHeader("Authorization");
             if (authorizationHeader == null) {
                 response.setStatus(401);

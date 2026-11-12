@@ -6,6 +6,7 @@ import com.example.payment.dto.ResponseData;
 import com.example.payment.service.PaymentService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,11 +16,12 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class PaymentController {
 
-    String baseUrl = "http://localhost:3000";
+    @Value("${BASE_URL}")
+    String baseUrl;
 
     private final PaymentService paymentService;
 
-    @PostMapping("/api/order-temp")
+    @PostMapping("/api/payment/order-temp")
     public ResponseData orderTemp(@RequestBody Map<String, Object> body) {
 
         String orderKey = (String) body.get("orderKey");
@@ -38,7 +40,7 @@ public class PaymentController {
         }
     }
 
-    @PostMapping("/serverAuth")
+    @PostMapping("/api/serverAuth")
     public void nicePaymentReturn(HttpServletResponse response, @RequestParam Map<String, String> body) {
 
         String authResultCode = body.get("authResultCode");
@@ -71,7 +73,7 @@ public class PaymentController {
         }
     }
 
-    @GetMapping("/api/order-info")
+    @GetMapping("/api/payment/order-info")
     public ResponseData orderInfo( @AuthenticationPrincipal String authId, @RequestParam String orderId) {
 
         return new ResponseData(true, paymentService.getOrderInfo(orderId, authId));

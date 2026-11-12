@@ -2,6 +2,7 @@ package com.example.payment.config;
 
 import com.example.payment.service.OAuth2UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -17,6 +18,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+    @Value("${BASE_URL}")
+    String baseUrl;
+
     private final TokenProvider tokenProvider;
     private final OAuth2AuthorizationRequestBasedOnCookieRepository oAuth2AuthorizationRequestBasedOnCookieRepository;
     private final OAuth2UserService oAuth2UserService;
@@ -27,7 +31,7 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/account/**").authenticated()
+                        .requestMatchers("/api/account/**", "/api/payment/**").authenticated()
                         .anyRequest().permitAll()
                 )
                 .oauth2Login(oauth ->oauth
@@ -36,8 +40,7 @@ public class SecurityConfig {
                         .userInfoEndpoint(user ->  user
                                 .userService(oAuth2UserService))
                         .successHandler(oAuth2SuccessHandler)
-                        .failureUrl("http://localhost:3000/oauth/callback?error=true")
-//                                .failureUrl("/oauth/callback?error=true")
+                                .failureUrl(baseUrl + "/oauth/callback?error=true")
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
