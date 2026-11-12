@@ -9,7 +9,7 @@ build/
 !**/src/test/**/build/
 
 ############################################
-# Next.js / Node
+# React (Vite) / Node
 ############################################
 # dependencies
 node_modules/
@@ -18,31 +18,28 @@ node_modules/
 **/.yarn/install-state.gz
 
 # build output
-.next/
-out/
-!**/src/main/**/out/
-!**/src/test/**/out/
+dist/
+dist-ssr/
 
 # testing
 coverage/
 
-# debug logs
+# typescript
+*.tsbuildinfo
+
+# cloudflare (사용하지 않으면 삭제해도 됨)
+.wrangler
+
+############################################
+# Logs
+############################################
+logs/
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-
-# vercel
-.vercel
-
-# typescript
-*.tsbuildinfo
-next-env.d.ts
-
-############################################
-# Environment / Secrets
-############################################
-.env*.local
-*.pem
+pnpm-debug.log*
+lerna-debug.log*
 
 ############################################
 # IDE
@@ -52,6 +49,9 @@ next-env.d.ts
 *.iws
 *.iml
 *.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
 
 ### STS / Eclipse ###
 .apt_generated
@@ -68,14 +68,23 @@ bin/
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/
-/dist/
 /nbdist/
 /.nb-gradle/
 
 ### VS Code ###
-.vscode/
+.vscode/*
+!.vscode/extensions.json
+
+### Visual Studio / Vim 등 ###
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.commandcode
 
 ############################################
 # OS
 ############################################
 .DS_Store
+Thumbs.db
